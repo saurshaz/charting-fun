@@ -36,17 +36,7 @@ export const HighStockChart = () => {
         console.log("Instantiating", id, "exchange");
 
         // instantiate the exchange by id
-        let exchange = new ccxt[id]({ enableRateLimit: interval });
-        let markets = await exchange.loadMarkets();
-        await updateChart(
-          id,
-          symbol,
-          rateLimit,
-          option,
-          myChart,
-          markets,
-          exchange
-        );
+        await updateChart(id, symbol, rateLimit, option);
       } else {
         console.log("Exchange " + id + " not found");
         // printSupportedExchanges ()
@@ -55,15 +45,17 @@ export const HighStockChart = () => {
   }, []);
 
   // const log = ololog.noLocate
-  let updateChart = async (id, symbol, rateLimit, exchange) => {
+  let updateChart = async (id, symbol, rateLimit) => {
     // check if the exchange is supported by ccxt
+    let exchange = new ccxt[id]({ enableRateLimit: interval });
+    let markets = await exchange.loadMarkets();
 
     exchange.rateLimit = rateLimit ? rateLimit : exchange.rateLimit;
 
     console.log("Rate limit:", exchange.rateLimit.toString());
 
     // load all markets from the exchange
-    if (symbol in exchange.markets) {
+    if (symbol in markets) {
       // while (true) {
       const tick = await exchange.fetchOHLCV(symbol, interval);
       let index = [];
